@@ -1,0 +1,21 @@
+{% extends "basic.html" %}
+{% block content %}
+    <h1>Login</h1>
+    <form action="" method="post">
+        <p>
+            {{ loginForm.username.label }}
+            {{ loginForm.username() }}
+        </p>
+        <p>
+            {{ loginForm.password.label }}
+            {{ loginForm.password() }}
+        </p>
+        <p>
+            {{ loginForm.remember_me() }}
+            {{ loginForm.remember_me.label }}
+        </p>
+        <p>
+            {{ loginForm.submit() }}
+        </p>
+    </form>
+{% endblock %}

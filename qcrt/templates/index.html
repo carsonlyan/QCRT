@@ -1,0 +1,69 @@
+{% extends "basic.html" %}
+
+{% block content %}
+    <form action="" method="post">
+        <table>
+            <tr>
+                <td>{{ selector.codeLine.label }}</td>
+                <td>{{ selector.codeLine() }}</td>
+                <td>{{ selector.changeList.label }}</td>
+                <td>{{ selector.changeList() }}</td>
+<!--                <td><button type="button" id="btn_summary">Summary</button></td>-->
+                <td>{{ selector.summary() }}</td>
+            </tr>
+        </table>
+    </form>
+    <div>
+        <table>
+            {% for list_of_table_datas in table_datas|batch(2, {}) %}
+            <tr>
+                {% for table_data in list_of_table_datas %}
+                {% if table_data %}
+                {% set test_type = table_data.keys()|first %}
+                {% set table_data_value = table_data.values()|list|first %}
+                <td valign="top">
+                    <table class="table table-striped"  border="3">
+                        <tr>
+                            <td colspan={{ headers|length }} align="center">
+                                {{ test_type }} Summary&nbsp&nbsp&nbsp&nbsp&nbsp{{ code_line }} {{ change_list }}
+                            </td>
+                        </tr>
+                        {% if table_data_value %}
+                        <tr>
+                            {% for header in headers  %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for test_case, result in table_data_value.items() %}
+                            <tr>
+                                <td>{{ test_case }}</td>
+                                <td>{{ result['total']|safe }}</td>
+                                <td>{{ result['pass']|safe }}</td>
+                                <td>{{ result['rerun_pass']|safe }}</td>
+                                <td>{{ result['skip']|safe }}</td>
+                                <td>{{ result['fail']|safe }}</td>
+                                <td>{{ result['error']|safe }}</td>
+                                <td>{{ result['inconclusive']|safe }}</td>
+                                <td>{{ result['duration']|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr><td>No Data</td></tr>
+                        {% endif %}
+                    </table>
+                </td>
+                {% else %}
+                <td><table></table></td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br>
+    <div id="detail_div"></div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

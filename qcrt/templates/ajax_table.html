@@ -1,0 +1,16 @@
+<table class="table table-striped">
+     <tr>
+        {% for header in headers  %}
+            <th>{{ header }}</th>
+        {% endfor %}
+     </tr>
+    {% for table_data in table_datas %}
+    <tr>
+        <td>{{ table_data['testtype'] }}</td>
+        <td>{{ table_data['codeline'] }}</td>
+        <td>{{ table_data['changelist'] }}</td>
+        <td>{{ table_data['testmethod'] }}</td>
+        <td>{{ table_data['result'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
