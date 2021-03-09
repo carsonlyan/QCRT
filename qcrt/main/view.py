@@ -3,6 +3,8 @@ from wtforms import SelectField, SubmitField
 from wtforms.validators import DataRequired
 from flask import render_template, request
 from .table import HEADERS, TABLES, DETAIL_HEADERS,  create_table, bind_detail_table_data
+import math
+import json
 from . import main
 
 
@@ -57,13 +59,23 @@ def index():
 def ajax_receive():
     data = request.args
     data = eval(list(data.lists())[0][0])
-    print(data)
-    table_datas = bind_detail_table_data(data['codeline'],
-                                         data['changelist'],
-                                         data['testtype'],
-                                         data['result'],
-                                         data['testmethod'])
-    return render_template('ajax_table.html', headers=DETAIL_HEADERS, table_datas=table_datas)
+    paginates, table_datas = bind_detail_table_data(data['codeline'],
+                                                    data['changelist'],
+                                                    data['testtype'],
+                                                    data['result'],
+                                                    data['testmethod'],
+                                                    data['page'],
+                                                    data['perpage'])
+    total_page = math.ceil(paginates.total/data['perpage'])
+    data['testmethod'] = data['testmethod'].replace('\\', '\\\\')
+    return render_template('ajax_table.html',
+                           headers=DETAIL_HEADERS,
+                           table_datas=table_datas,
+                           data=data,
+                           paginates=paginates,
+                           total_page=total_page)
+
+
     # headers = ['TestCases', 'Total', 'Pass', 'Rerun_Pass', 'Skip', 'Fail', 'Error', 'Inconclusive', 'Duration(h)']
     # testTypes = ['lrt']
     #

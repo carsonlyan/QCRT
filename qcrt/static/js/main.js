@@ -15,13 +15,18 @@ $(function(){
         })
     });
 })
-function showDetails(dl, cl, test_type, test_method, result){
+function showDetails(dl, cl, testtype, testmethod, result, page, perpage){
+    if (page < 0){
+        var page = parseInt($('#jumpPage').val())
+    }
     var data = {
         'codeline': dl,
         'changelist': cl,
-        'testtype': test_type,
-        'testmethod': test_method,
-        'result': result
+        'testtype': testtype,
+        'testmethod': testmethod,
+        'result': result,
+        'page': page,
+        'perpage': perpage
     }
     $.ajax({
         url: '/ajax_receive',

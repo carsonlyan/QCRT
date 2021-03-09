@@ -21,20 +21,22 @@ DETAIL_HEADERS = ['TestType',
                  ]
 
 
-def bind_detail_table_data(code_line, change_list, test_type, result, test_method):
+def bind_detail_table_data(code_line, change_list, test_type, result, test_method, page=1, per_page=10):
     known_data = {'CodeLine': code_line,
                   'ChangeList': change_list,
-                  'TestType': test_type,
-                  'Result': result}
+                  'TestType': test_type}
     detail_table_datas = []
-    tmp_detail_table_data = {}
-    for item in testResult.query_detail(code_line, change_list, test_type, result, test_method):
+
+    paginates = testResult.query_pagination_detail(code_line, change_list, test_type, result, test_method, page, per_page)
+    for item in paginates.items:
+        tmp_detail_table_data = {}
         tmp_detail_table_data['testmethod'] = item[0]
+        tmp_detail_table_data['result'] = item[1]
         for head in DETAIL_HEADERS:
             if head in known_data.keys():
                 tmp_detail_table_data.setdefault(head.lower(), known_data[head])
         detail_table_datas.append(tmp_detail_table_data)
-    return detail_table_datas
+    return paginates, detail_table_datas
 
 
 TABLES = {
@@ -69,7 +71,15 @@ class BaseTable(object):
     def bind_table_data(self):
         if not self._db_has_data:
             return {}
+        post_data = {
+            'codeline': self._code_line,
+            'changelist': self._change_list,
+            'testtype': self._test_type,
+            'page': 1,
+            'perpage': 10
+        }
         for test_case in self._Test_Cases:
+            post_data['testmethod'] = test_case.replace('\\', '\\\\')
             total_count = 0
             duration = testResult.query_duration(self._code_line, self._change_list, self._test_type, test_case)[0][0]
             if duration is None:
@@ -77,27 +87,18 @@ class BaseTable(object):
                 continue
             for item in testResult.query_result_count(self._code_line, self._change_list, self._test_type, test_case):
                 result = item[0].lower()
+                post_data['result'] = result
                 count = item[1]
                 total_count += count
                 count = str(count)
+                post_data['count'] = count
                 if count != '0':
-                    count = '''<a href="javascript:;" onclick="showDetails('{}', '{}', '{}', '{}', '{}')">{}</a>'''.format(
-                                                                                                    self._code_line,
-                                                                                                    self._change_list,
-                                                                                                    self._test_type,
-                                                                                                    test_case,
-                                                                                                    result,
-                                                                                                    count)
+                    count = '''<a href="javascript:;" onclick="showDetails('{codeline}','{changelist}','{testtype}','{testmethod}','{result}',{page},{perpage})">{count}</a>'''.format(**post_data)
                 self._table_data[test_case][result] = count
             total_count = str(total_count)
+            post_data['count'] = total_count
             if total_count != '0':
-                total_count = '''<a href="javascript:;" onclick="showDetails('{}', '{}', '{}', '{}', '{}')">{}</a>'''.format(
-                                                                                                    self._code_line,
-                                                                                                    self._change_list,
-                                                                                                    self._test_type,
-                                                                                                    test_case,
-                                                                                                    result,
-                                                                                                    total_count)
+                total_count = '''<a href="javascript:;" onclick="showDetails('{codeline}','{changelist}','{testtype}','{testmethod}','total',{page},{perpage})">{count}</a>'''.format(**post_data)
             self._table_data[test_case]['total'] = total_count
             self._table_data[test_case]['duration'] = duration
 

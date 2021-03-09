@@ -31,20 +31,23 @@ def query_result_count(code_line, change_list, test_type, test_method='') -> lis
     return query_result
 
 
-def query_detail(code_line, change_list, test_type, result, test_method=''):
+def query_pagination_detail(code_line, change_list, test_type, result, test_method='', page=1, per_page=10):
     if test_method.lower() == 'total':
         test_method = ''
     query_result = TTestResult.query.with_entities(
-            TTestResult.TestMethod
+            TTestResult.TestMethod,
+            TTestResult.Result
         ).join(TSUBApex
         ).filter(
             TTestResult.CodeLine==code_line,
             TTestResult.ChangeList==change_list,
             TTestResult.TestType==test_type,
-            TTestResult.Result==result,
             db.func.lower(TTestResult.TestMethod).like(
                 '%{}%'.format(test_method))
-        ).all()
+        )
+    if result.lower() != 'total':
+        query_result = query_result.filter(TTestResult.Result==result)
+    query_result = query_result.order_by(TTestResult.ID).paginate(page,per_page,error_out=False)
     return query_result
 
 

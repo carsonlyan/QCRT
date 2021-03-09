@@ -14,3 +14,48 @@
     </tr>
     {% endfor %}
 </table>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% if paginates.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="javascript:;" onclick="showDetails('{{ data.codeline }}','{{ data.changelist }}','{{ data.testtype }}','{{ data.testmethod }}','{{ data.result }}',{{ paginates.prev_num }},{{ data.perpage }})">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" tabindex="-1" aria-disabled="true">Previous</a>
+        </li>
+        {% endif %}
+
+        {%  for i in  paginates.iter_pages() %}
+            {% if i==None %}
+            <li class="page-item disabled">
+              <a class="page-link" tabindex="-1" aria-disabled="true">...</a>
+            </li>
+            {% elif i==paginates.page %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="javascript:;" onclick="showDetails('{{ data.codeline }}','{{ data.changelist }}','{{ data.testtype }}','{{ data.testmethod }}','{{ data.result }}',{{ i }},{{ data.perpage }})">{{ i }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="javascript:;" onclick="showDetails('{{ data.codeline }}','{{ data.changelist }}','{{ data.testtype }}','{{ data.testmethod }}','{{ data.result }}',{{ i }},{{ data.perpage }})">{{ i }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+        {% if paginates.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="javascript:;" onclick="showDetails('{{ data.codeline }}','{{ data.changelist }}','{{ data.testtype }}','{{ data.testmethod }}','{{ data.result }}',{{ paginates.next_num }},{{ data.perpage }})">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true">Next</a>
+        </li>
+        {% endif %}
+        <li class="page-item">
+            <div class="input-group mb-3">
+                <input id="jumpPage" type="text" class="form-control" placeholder="Jump to" aria-label="Jump to" aria-describedby="button-addon2">
+                <button class="btn btn-outline-secondary" onclick="showDetails('{{ data.codeline }}','{{ data.changelist }}','{{ data.testtype }}','{{ data.testmethod }}','{{ data.result }}',-1,{{ data.perpage }})">Go</button>
+            </div>
+        </li>
+    </ul>
+</nav>
