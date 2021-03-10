@@ -148,5 +148,5 @@ class LRTTable(BaseTable):
 
 def create_table(code_line, change_list, test_type):
     class_name = TABLES[test_type]
-    main_module = importlib.import_module('qcrt.main.table')
+    main_module = importlib.import_module('qcrt.ajax.table')
     return main_module.__dict__[class_name](code_line, change_list, test_type)
